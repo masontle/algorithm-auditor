@@ -1,0 +1,4 @@
+node_modules/
+submissions/
+staff/private/
+*.log

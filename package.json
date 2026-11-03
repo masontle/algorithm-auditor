@@ -1,0 +1,1 @@
+{"name":"algorithm-auditor","version":"1.0.0","private":true,"type":"module","description":"A no-code club recommendation auditing exercise","scripts":{"start":"node server.mjs","test":"node --test","evaluate":"node staff/evaluate.mjs"},"engines":{"node":">=22"}}

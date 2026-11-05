@@ -28,7 +28,7 @@ For each club, the score is `100 * (wInterest * interestMatch + wSchedule * sche
 
 Each profile has an explicit `suitable` list used for evaluation, independent of scoring weights. In this deliberately simple sample, suitability means matching an interest and an available meeting. Top-1 suitability divides suitable first choices by all profiles, including no-result profiles as failures. Subgroup memberships overlap and denominators are displayed. Empty subgroups are N/A. Variety is distinct top-1 clubs plus frequency counts, not a claim of fairness.
 
-Baseline weights are 30/10/60 with filtering off. Overall suitability is 70%, while both highlighted subgroups score 0%. Turning the filter on alone raises overall suitability to 90%; uncommon-interest suitability reaches 50%. An instructor demonstration using 80/10/10 and filtering reaches 100% on visible profiles. This is a designed teaching example, not evidence of real-world fairness or generalization.
+The revised lab contains 42 cases spanning 41 distinct interest/availability combinations, including students with multiple interests, no suitable available club, and conflicting club-size preferences. Read `STUDENT_GUIDE.md` for the answer-free learner walkthrough. Instructor notes and assessment details are in `staff/REVIEW_GUIDE.md`.
 
 ## Staff evaluation and data boundary
 
@@ -41,10 +41,10 @@ node staff/make-sample.mjs
 npm run evaluate -- path/to/submission.json staff/sample-profiles.json
 ```
 
-The sample fixture repeats visible scenario patterns: it is **not a genuine hidden test**. For an actual assignment, staff must independently author unseen profiles, include both audited groups, use IDs disjoint from visible profiles, and keep them in `staff/private/` (ignored by Git) or outside this repository. The evaluator accepts a JSON array of profiles with `id`, `interests`, `availability`, `limited`, `uncommon`, and `suitable`; see `dist/engine.js` for the schema. Do not put private data in `dist/`, commits, screenshots, or CI artifacts. Students get no hidden-score endpoint.
+The sample fixture is public: it is **not a genuine hidden test**. For an actual assignment, a locally authored 12-case held-out dataset is supplied in `staff/private/unseen-v2.json` on this machine only. It has unseen interest/schedule combinations and both audited groups. It is intentionally excluded from GitHub. For other instructors, author independent profiles and keep them in `staff/private/` (ignored by Git) or outside this repository. The evaluator accepts a JSON array of profiles with `id`, `interests`, `availability`, `limited`, `uncommon`, and `suitable`; see `dist/engine.js` for the schema. Do not put private data in `dist/`, commits, screenshots, or CI artifacts. Students get no hidden-score endpoint.
 
 ```sh
-npm run evaluate -- path/to/submission.json staff/private/unseen.json
+npm run evaluate -- path/to/submission.json staff/private/unseen-v2.json
 ```
 
 The evaluator recomputes baseline and submitted results, ignoring student-claimed metrics. It awards only the hidden-evaluation component (25 points): ≥10 percentage-point overall gain with no subgroup decline: 25; positive gain with no subgroup decline: 20; unchanged overall with a subgroup gain and no subgroup decline: 15; unchanged overall and subgroups: 10; otherwise: 5. These prototype bands are published in the student UI and need course-staff approval/piloting.
@@ -55,7 +55,7 @@ Staff assess the remaining 75 points: decision log (40: predictions, controlled 
 
 Implements the proposal's single scenario, three weights, schedule filter, ranked factor contributions, guided prediction, visible validation data, subgroup results, frequency view, decision log, JSON export, and offline staff evaluator. The proposal does not specify numeric weights, datasets, exact formula, or grading bands; those are explicit prototype design choices here.
 
-Synthetic labels omit nuanced preferences, accessibility, cost, transport, meeting duration, and multi-session schedules. There is no one uniquely correct configuration. A perfect visible score is easy by design and must not be treated as proof on new data. No classroom timing or rubric reliability study has been performed. Browser storage is device-specific; export before switching devices. Fonts fall back to local sans-serif if offline.
+Synthetic labels omit nuanced preferences, accessibility, cost, transport, meeting duration, and multi-session schedules. There is no one uniquely correct configuration. A perfect score is impossible with the three available inputs: two students have identical scoring inputs and disjoint suitability labels. No classroom timing or rubric reliability study has been performed. Browser storage is device-specific; export before switching devices. Fonts fall back to local sans-serif if offline.
 
 ## Layout
 
@@ -67,3 +67,7 @@ Synthetic labels omit nuanced preferences, accessibility, cost, transport, meeti
 Based on the supplied two-page proposal; the original PDF is not redistributed in this repository.
 
 
+
+## Verification and release status
+
+Version 2 changes the dataset and uses a new browser storage key. Old version 1 progress stays in the browser but is not mixed into version 2. The evaluator rejects submissions for the wrong dataset version. Automated interface simulations cover prediction gating, controlled changes, history, reload, and export; these do not verify actual browser layout or downloads. See `staff/REVIEW_GUIDE.md` for the required browser and pilot checklist.

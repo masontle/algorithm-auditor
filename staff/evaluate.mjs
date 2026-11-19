@@ -1,5 +1,6 @@
 import {readFile} from 'node:fs/promises';
 import {pathToFileURL} from 'node:url';
+import {submissionEvidence} from '../dist/feed-engine.js';
 import {baseline,evaluate,validate,clubs,datasetVersion,profiles} from '../dist/engine.js';
 export function grade(submission,hidden){
  if(submission.schemaVersion!==1||submission.datasetVersion!==datasetVersion)throw Error('Unsupported submission version');
@@ -18,5 +19,17 @@ export function grade(submission,hidden){
  return {before,after,hiddenEvaluationPoints:points,outOf:25,note:'Prototype published bands. Staff must grade log (40), diagnosis (25), and reflection (10) separately. Recomputed metrics ignore student-supplied scores.'};
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
- try{const [, ,submissionPath,dataPath]=process.argv;if(!submissionPath||!dataPath)throw Error('Usage: npm run evaluate -- submission.json path/to/private-profiles.json');console.log(JSON.stringify(grade(JSON.parse(await readFile(submissionPath,'utf8')),JSON.parse(await readFile(dataPath,'utf8'))),null,2));}catch(e){console.error(e.message);process.exitCode=1;}
+ try {
+  const [, ,submissionPath,dataPath]=process.argv;
+  if(!submissionPath) throw Error('Usage: npm run evaluate -- submission.json [club-profiles.json]');
+  const submission=JSON.parse(await readFile(submissionPath,'utf8'));
+  let result;
+  if(submission.schemaVersion===2) {
+   result=submissionEvidence(submission);
+  } else {
+   if(!dataPath) throw Error('Club audit submissions require a held-out profiles file.');
+   result=grade(submission,JSON.parse(await readFile(dataPath,'utf8')));
+  }
+  console.log(JSON.stringify(result,null,2));
+ } catch(e) {console.error(e.message);process.exitCode=1;}
 }

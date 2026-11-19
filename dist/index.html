@@ -1,8 +1,66 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Algorithm Auditor | Club Lab</title><link rel="stylesheet" href="style.css"></head><body>
-<header><span class="logo">Aa</span><strong>Algorithm Auditor</strong><span class="tag">CLUB LAB / 01</span></header>
-<main><p class="eyebrow">A SELF-PACED INVESTIGATION · ABOUT 2 HOURS</p><h1>Good for everyone?<br><em>Look a little closer.</em></h1><p class="intro">A club recommendation system looks successful on average. Your job: find who it leaves behind, change the rules, and defend your decisions.</p>
-<nav><a href="#investigate">01 Investigate · 40 min</a><a href="#improve">02 Experiment · 60 min</a><a href="#submit">03 Reflect · 15 min</a></nav>
-<section id="investigate"><p class="eyebrow">01 / FOLLOW THE EVIDENCE</p><h2>Start with a prediction</h2><p>The guided student likes poetry and can attend only morning meetings. The original system uses 30% interest, 10% schedule, and 60% popularity. Which club will rank first? Why?</p><h3>Club reference for your prediction</h3><p>Interest match is 1 for poetry and 0 otherwise; schedule match is 1 for morning and 0 otherwise. Score = 30 - interest match + 10 - schedule match + 60 - popularity.</p><div id="clubReference" class="scroll"></div><label>Your prediction<textarea id="guidedPrediction" placeholder="Predict a club and explain your calculation."></textarea></label><button id="reveal">Save prediction & reveal</button><div id="guided" hidden></div><details id="hint" hidden><summary>First case hint</summary>Campus Connect scores 60 for popularity despite no interest match or schedule compatibility. Poetry Circle scores 30 + 10 + 4.8 = 44.8. Can popularity overwhelm usefulness?</details><p>Next: inspect Students 1, 13, 41, and 42. Find a schedule failure and a preference conflict. Support each diagnosis with score contributions.</p><label>Diagnosis and evidence<textarea id="diagnosis" placeholder="Name profiles, clubs, and score contributions that support your diagnosis."></textarea></label></section>
-<section id="improve" hidden><p class="eyebrow">02 / CHANGE ONE THING</p><h2>Make a defensible improvement</h2><p>Change one setting from the last run, predict the effect, then test. Weights are normalized by their sum; zero total weight is invalid.</p><div class="workspace"><aside><h3>Scoring rules</h3><div id="controls"></div><label class="check"><input type="checkbox" id="filter"> Exclude unavailable clubs</label><label>Before you run: what will change?<textarea id="prediction" placeholder="Which group should improve? What might become worse?"></textarea></label><button id="run">Run comparison</button><p id="message" role="status"></p><button id="reset" class="secondary">Undo untested edits</button></aside><div><h3>Visible validation results</h3><p>42 synthetic profiles with 41 distinct interest/schedule combinations. Groups overlap. Empty recommendations count as unsuitable.</p><div id="metrics"></div><h3>How an average hides the problem</h3><div id="populationMix"></div><h3>Recommendation variety</h3><div id="variety"></div></div></div><h3>Trace a recommendation</h3><label>Student profile<select id="profile"></select></label><p id="profileInfo"></p><div class="scroll"><table><thead><tr><th>Club / meeting</th><th>Interest</th><th>Schedule</th><th>Popularity</th><th>Total</th><th>Suitable label</th></tr></thead><tbody id="ranking"></tbody></table></div><p class="muted">Score = 100 × (interest weight × match + schedule weight × compatibility + popularity weight × popularity) ÷ sum of weights. Interest match is the fraction of student interests in the club tags. Schedule is 0 or 1. Ties use club ID.</p><h3>Investigation checkpoints</h3><ol><li>Identify a recommendation the student cannot attend.</li><li>Test the filter and compare both groups, including no-result profiles.</li><li>Compare Students 41 and 42. Which preference is missing from the scoring inputs?</li><li>Run at least three controlled comparisons; include an unsuccessful change.</li><li>Explain whether suitability and variety moved together, and why.</li></ol><h3>Your experiment log</h3><div id="log"></div></section>
-<section id="submit" hidden><p class="eyebrow">03 / EXPLAIN THE TRADEOFF</p><h2>Submit your reasoning</h2><label>Final reflection<textarea id="reflection" placeholder="What improved, what worsened, why is the tradeoff reasonable, what do labels miss, and what would you test next?"></textarea></label><p>Export includes your last tested settings, prediction, diagnosis, results, and decision log. Staff evaluate unseen profiles offline; hidden results are never returned here.</p><button id="export">Export submission (.json)</button><p id="exportMessage" role="status"></p><details><summary>Published assessment rubric</summary><p>Decision log 40% · Diagnosis 25% · Hidden evaluation 25% · Reflection 10%.</p><p>Example hidden-evaluation bands (of 25): 25 if overall improves ≥10 percentage points and neither subgroup declines; 20 if overall improves and neither subgroup declines; 15 if overall is unchanged and a subgroup improves with no subgroup decline; 10 if all rates match baseline; otherwise 5. Staff assess reasoning separately. These are prototype bands for a pilot, not a validated course grading policy.</p></details></section>
-<footer>Synthetic data only. No accounts, live student data, or model training. Progress is saved in this browser when storage is available. Pilot the exercise to verify the proposed 1–3 hour completion time.</footer></main><script type="module" src="app.js"></script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Algorithm Auditor | Feed experiment</title>
+  <link rel="stylesheet" href="feed.css">
+</head>
+<body>
+  <header><div class="wrap masthead"><span><b class="mark">Aa</b> Algorithm Auditor</span><a href="club-audit.html">Club audit extension ↗</a></div></header>
+  <main class="wrap">
+    <h1>When should a feed<br>try something new?</h1>
+    <p class="intro">Follow two feeds for one fictional viewer. By the end, you’ll be able to trace how watching a clip changes the next recommendation and use six rounds of evidence to defend when a feed should explore.</p>
+
+    <section aria-labelledby="predict-title">
+      <h2 id="predict-title">Predict the tradeoff</h2>
+      <p>Alex follows the campus skate club. Both feeds start with the same estimated watch time for a 20-second clip. They get the same clips in the same order within each topic, and Alex watches each clip for the same amount of time in either feed.</p>
+      <div id="priors" class="priors" aria-label="Starting watch estimates"></div>
+      <div class="policy-grid">
+        <div><h3>Feed A · Follow the estimate</h3><p>Always pick the topic with the highest estimated watch time. This is <strong>exploitation</strong>.</p></div>
+        <div><h3>Feed B · Test a topic</h3><p>On two rounds, pick the least-shown topic. This is <strong>exploration</strong>. On every other round, use the same rule as Feed A.</p></div>
+      </div>
+      <p class="note">Ties go to the first topic in the order shown above. Each estimate starts with one imagined view, so the first real view can shift it substantially.</p>
+      <form id="start-form">
+        <label for="secondProbe">Feed B explores in round 2. When should it explore again?</label>
+        <select id="secondProbe"><option value="4">Round 4</option><option value="6">Round 6</option></select>
+        <label for="prediction">Which feed will show more topics? Which will earn more watch time, and why?</label>
+        <textarea id="prediction" required></textarea>
+        <button id="start">Save prediction and start</button>
+      </form>
+    </section>
+
+    <section id="experiment" aria-labelledby="run-title" hidden>
+      <div class="section-head"><h2 id="run-title" tabindex="-1">Compare the feeds</h2><span id="progress" role="status"></span></div>
+      <p>Each feed learns only from clips it shows. After a view, it averages the fraction watched with all earlier views of that topic, including the imagined starting view.</p>
+      <div class="cards">
+        <article><h3>Feed A</h3><div id="familiar"></div></article>
+        <article><h3>Feed B</h3><div id="discovery"></div></article>
+      </div>
+      <button id="advance">Show round 1</button>
+      <details id="history"><summary>Round-by-round evidence</summary>
+        <div class="scroll"><table><caption>Watch time and topic estimate for every recommendation</caption>
+          <thead><tr><th>Round</th><th>Feed</th><th>Rule</th><th>Topic / clip</th><th>Watched</th><th>Estimate before → after</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table></div>
+      </details>
+    </section>
+
+    <section id="assessment" aria-labelledby="assessment-title" hidden>
+      <h2 id="assessment-title" tabindex="-1">Defend a policy</h2>
+      <form id="export-form">
+        <label for="signal">Trace one feedback loop. Which clip did Alex watch or skip, how did its topic estimate change, and what did the feed recommend at a later round?</label>
+        <textarea id="signal" required></textarea>
+        <label for="tradeoff">Which exploration schedule would you use next time? Cite one probe and both feeds’ final watch time and topic counts. Explain what the probe cost or gained.</label>
+        <textarea id="tradeoff" required></textarea>
+        <label for="limitation">Give one reason Alex might keep watching a clip besides enjoying it. What other evidence would help you check your interpretation?</label>
+        <textarea id="limitation" required></textarea>
+        <button>Export submission (.json)</button>
+        <p id="export-status" role="status"></p>
+      </form>
+    </section>
+    <footer>All viewing behavior is simulated. Progress is saved in this browser. <span id="storage-status" role="status"></span></footer>
+  </main>
+  <script type="module" src="feed-app.js"></script>
+</body>
+</html>

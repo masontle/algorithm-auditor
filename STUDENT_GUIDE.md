@@ -1,11 +1,11 @@
-# Your Algorithm Auditor investigation
+# Investigate a recommendation feed
 
-Start the website using the repository README. No coding is required in the activity.
+Your task is to explain how a feed learns from what Alex watches and decide when it is worth trying an unfamiliar topic. Open the feed experiment using the README. You can do the activity without writing code.
 
-1. Use the club reference to calculate a prediction for the guided student. Save your prediction to unlock the investigation.
-2. Diagnose a schedule failure and a preference conflict using individual score contributions and group results. Some profiles have no suitable available club; explain what a ranking can and cannot fix.
-3. Make at least three controlled comparisons. Change one raw weight or the filter each time. Write your prediction before running, then explain the observed effects. Include one change that did not help, or explain why the evidence contradicted your expectation.
-4. Inspect your log: compare overall and subgroup suitability, recommendation variety, and no-result counts. Increasing one raw weight changes its normalized share and the shares of other factors; explain this relationship.
-5. Reflect on benefits, harms, missing information, label limitations, and your next test. Export your submission. Submit the JSON file through your instructor's chosen course channel.
+1. **Predict.** Read the three starting estimates. Feed A picks the topic with the highest estimate every round. Feed B uses two rounds to sample the least-shown topic. Choose the timing of the second probe and predict which feed will show more topics and which will accumulate more watch time. Give your reasoning before revealing either feed.
+2. **Follow the evidence.** Reveal one round at a time. Compare the clips, the seconds watched out of 20, and the estimates before and after. Find a case where a viewing event helps explain a later pick. To check an estimate by hand, add the imagined starting watch fraction to the observed fractions for that topic, then divide by the number of fractions you added.
+3. **Defend a policy.** Use the round history to cite a specific exploration decision. Compare total seconds watched and distinct topics shown in both feeds. Explain which timing you would choose for another six-round session and why. If an outcome surprised you, explain how it differed from your prediction.
+4. **Question the signal.** Describe a reason Alex might watch a clip besides liking it. Name another observation that could help you distinguish those explanations.
+5. **Submit.** Export the JSON after all six rounds and submit it through your instructor’s course channel. Your progress resumes in the same browser. Keep the exported file if you change devices.
 
-The button Undo untested edits returns controls to the last tested settings without erasing history. Export always uses the last tested settings. Keep the exported file before changing devices. Timing is provisional; your instructor may adapt the suggested 40-minute investigation, 60-minute experiment, and 15-minute reflection periods.
+The club audit linked in the header is an optional, separate exercise. Its [walkthrough](docs/club-student-guide.md) covers weighted ranking.

@@ -1,42 +1,32 @@
-# Instructor and supervisor review guide
+# Assessing the feed experiment
 
-## Changes addressing the review
+Students investigate a single question. When should a feed spend a recommendation learning about an unfamiliar topic? Ask students to save a prediction, observe both feeds for six rounds, and support their policy choice using the exported history. To compare schedules in class, have some students probe on rounds 2 and 4 and others on rounds 2 and 6.
 
-1. Prediction: results and tuning are hidden until a nonempty prediction is saved; the club reference supplies the necessary inputs without ranking them. The saved guided prediction is locked. A first-case hint unlocks afterward.
-2. Data: 42 validation profiles contain 41 distinct interest/schedule combinations, multiple interests, missing suitable opportunities, and a pair with opposing club-size preferences. Context and labels are visible for diagnosis. This is deliberately constructed teaching data, not a representative campus sample.
-3. Tradeoffs: Students 41 and 42 have identical algorithm inputs but disjoint labels. No weight configuration can satisfy both. Preferences are explicit rather than arbitrary labels. No-club cases also distinguish catalog limitations from ranking errors. Students must discuss which inputs or opportunities would need changing.
-4. Evidence: each experiment retains and displays before/after rules, overall and subgroup rates, variety, recommendation counts, and no-result counts. Undo untested edits restores the last run, so it never violates the one-change rule. Predictions in progress survive reload.
-5. Assessment: the offline evaluator checks dataset version and rejects visible profile combinations. Twelve separately authored held-out cases are stored locally in ignored `staff/private/unseen-v2.json`; they are not in the student website or GitHub repository. Instructors cloning the repository must author their own. Genuine classroom validity still needs a pilot.
+## Worked results
 
-## Instructor demonstration (do not distribute as student guidance)
+The skating estimate begins at 75%, equivalent to one imagined 15-second view. In round 1 both feeds show “First kickflip.” Watching 14 of 20 seconds moves the estimate to (15 + 14) / 40 = 72.5%. In round 2, Feed A returns to skating. Feed B breaks a least-shown tie in catalog order and tries music. Alex watches 3 seconds, moving music from 50% to 32.5%. The probe costs 10 seconds against Feed A that round.
 
-Baseline suitability is 13/42 (31.0%); limited schedules 5/20; uncommon interests 5/26. Filtering alone yields 28/42, and weights 80/10/10 with filtering yield 35/42. Neither is a perfect answer. The balanced validation set now emphasizes diagnosis rather than a realistic high overall average; discuss how different population proportions could make an average look reassuring. The student view also shows a clearly labeled population-mix demonstration: adding 100 flexible social-interest copies gives a 79.6% baseline average while subgroup rates stay low. These are weighting copies, not independent new cases. A representative real-world cohort would require separate design.
+| Six-round policy | Total watch time | Distinct topics |
+| --- | ---: | ---: |
+| Always exploit | 84 s | 1 |
+| Explore in rounds 2 and 4 | 87 s | 3 |
+| Explore in rounds 2 and 6 | 79 s | 3 |
 
-## Prose grading rubric (75 points)
+The first making clip receives a full watch. With an early probe the estimate rises to 75%, above skating’s 70%. Feed B exploits that discovery in rounds 5 and 6. A final-round probe reaches the same variety but leaves no opportunity to use the update. Each feed observes only the clips it selects. An unshown topic retains its starting estimate. Fixed responses and equal-length clips isolate the policy choice for this viewer. They do not establish a generally optimal schedule or what Alex actually enjoys.
 
-Decision log, 40: predictions tied to factors (10); at least three one-setting comparisons (10); correct interpretation of overall, subgroup and variety evidence (10); explanations including an unsuccessful or surprising result (10). Per criterion award full credit for specific correct evidence, half for incomplete or partly supported reasoning, zero for absent or unsupported work.
+## Suggested manual rubric (10 points)
 
-Diagnosis, 25: documented schedule failure with score evidence (10); documented preference conflict or catalog limitation (10); distinction between label assumptions and actual student welfare (5). Full/half/zero anchors follow the rule above.
+| Criterion | Full-credit evidence | Points |
+| --- | --- | ---: |
+| Prediction | Predicts both measures and gives a reason tied to the policies. An unexpected result can receive full credit. | 2 |
+| Feedback loop | Identifies a real viewing event, correctly traces the estimate change, and connects it to a later choice. | 3 |
+| Exploration decision | Identifies a probe, compares both feeds on watch seconds and topics, and uses the tradeoff to defend a schedule. | 3 |
+| Signal limitation | Gives a plausible alternative interpretation of watch time and a concrete way to check it. | 2 |
 
-Reflection, 10: defensible benefits/harms tradeoff (4); limitations of labels and omitted inputs (3); concrete next test (3). Full/half/zero anchors follow the rule above. Staff review prose manually; editable exports are not authenticated assessment records.
+Award one point per element in each row. Either schedule can earn full credit with a defensible explanation. Read the learner’s words alongside the trace. The offline command regenerates the expected evidence from the schedule and dataset version:
 
-Hidden evaluation, 25: use the published prototype bands in the student UI and evaluator. Approve these bands before graded use; zero-opportunity cases impose an attainable ceiling. Do not disclose held-out scores during tuning. Do not rank students against each other.
+```sh
+npm run evaluate -- path/to/algorithm-auditor-feed.json
+```
 
-## Verification status
-
-All 10 automated checks pass, including application-handler simulation through reload, JSON export and offline evaluation. The in-app browser preview timed out again during this revision, so visual layout, actual downloads and keyboard/mobile behavior remain unverified. This is the remaining release check, along with the student pilot.
-
-## Browser acceptance checklist (must pass before student release)
-
-- Fresh storage: reference visible; answer, tuning and results hidden; blank prediction cannot unlock.
-- Save prediction: answer and investigation unlock; recorded prediction remains fixed.
-- Change one setting, predict and run; inspect every before/after metric. Two changes or blank predictions are rejected.
-- Explain the run; undo untested edits; make two further experiments.
-- Reload: prediction, diagnosis, reflection, log and last tested controls are restored.
-- Export: download opens as JSON with datasetVersion clubs-v2 and three explained experiments. Evaluate that exact file offline.
-- Keyboard-only navigation, 200% zoom, narrow/mobile layout, labels and focus indicators are usable.
-- Confirm `/staff/private/unseen-v2.json` and `/../staff/evaluate.mjs` cannot be served.
-
-## Pilot before release
-
-Run with 3-5 students unfamiliar with the implementation. Record completion times, places requiring hints, interpretation of subgroup denominators and normalized weights, export success, and ability to explain the conflicting-preference pair. Have two staff independently score the same responses and resolve rubric disagreements. Adjust pacing using observed times; do not claim the two-hour target is validated until then.
+Progress and exports are editable. This command supports instructor review. It does not grade prose or authenticate a submission. The [club audit review guide](CLUB_AUDIT_REVIEW.md) covers the separate extension and its evaluator.
